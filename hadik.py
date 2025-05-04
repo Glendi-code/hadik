@@ -57,12 +57,21 @@ try:
         apple = canvas.create_oval(x_apple, y_apple, x_apple + 20, y_apple + 20, fill="green")
 
     def game_over():
-        global score, highscore, score_log, game_on
+        global score, highscore, score_log, game_on, heads, head
         change_player.config(state="normal")
         game_end = tk.Label(canvas, text="GAME OVER")
         score_display = tk.Label(canvas, text="Score : " + str(score))
         canvas.config(highlightcolor="black")
         game_on = False
+
+        def delete_snake_parts(index=0):
+            if index < len(heads):
+                canvas.delete(heads[-(index + 1)])  # Start from the end
+                canvas.after(100, delete_snake_parts, index + 1)
+
+        delete_snake_parts()
+
+
         if score > highscore:
             highscore = score
             with open(file_path, 'w') as f:
