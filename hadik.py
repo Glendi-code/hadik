@@ -57,7 +57,7 @@ try:
         apple = canvas.create_oval(x_apple, y_apple, x_apple + 20, y_apple + 20, fill="green")
 
     def game_over():
-        global score, highscore, score_log
+        global score, highscore, score_log, game_on
         change_player.config(state="normal")
         game_end = tk.Label(canvas, text="GAME OVER")
         score_display = tk.Label(canvas, text="Score : " + str(score))
@@ -79,17 +79,18 @@ try:
         return
 
     def create_snake():
-        global heads, score, x_apple, y_apple, head, x_vector, y_vector, score_display, is_paused, game_on
+        global heads, score, x_apple, y_apple, head, x_vector, y_vector, score_display, is_paused, game_on, body_color
         heads = []
         x_vector = 0
         y_vector = 25
-        score = 0
+        score = 58
         game_on = True
         is_paused = False
         canvas.delete("all")
-        canvas.config(highlightcolor="red")
+        canvas.config(highlightcolor="#880808")
         canvas.focus_set()
-        head = canvas.create_rectangle(240, 240, 260, 260, fill="black")
+        head = canvas.create_rectangle(240, 240, 260, 260, fill="#880808")
+        body_color = "#AA4A44"
         change_player.config(state="disabled")
         score_display = tk.Label(root, text="Score : " + str(score))
         score_display.place(x=170, y=525, anchor="center")
@@ -118,13 +119,13 @@ try:
         y_vector = 0
 
     def move():
-        global heads, x_vector, y_vector, score, x_apple, y_apple, head, apple, highscore, score_display
+        global heads, x_vector, y_vector, score, x_apple, y_apple, head, apple, highscore, score_display, body_color
         x1, y1, x2, y2 = canvas.coords(head)
         positions = [canvas.coords(part) for part in heads]
         eat = canvas.find_overlapping(x1, y1, x2, y2)
 
         if is_paused:
-            canvas.after(100, move)  # keep checking for unpause
+            canvas.after(100, move)
             return
 
         if x1 < 0 or y1 < 0 or x2 > 500 or y2 > 500:
@@ -136,6 +137,30 @@ try:
                 game_over()
                 return
 
+        if 40 > score >= 20:
+            canvas.config(highlightcolor="#355E3B")
+            body_color = "#008000"
+            canvas.itemconfig(heads[0], fill="#355E3B")
+        elif 60 > score >= 40:
+            canvas.config(highlightcolor="#000080")
+            body_color = "#1434A4"
+            canvas.itemconfig(heads[0], fill="#000080")
+        elif 80 > score >= 60:
+            canvas.config(highlightcolor="#301934")
+            body_color = "#702963"
+            canvas.itemconfig(heads[0], fill="#301934")
+        elif 100 > score >= 80:
+            canvas.config(highlightcolor="#B59410")
+            body_color = "#D4AF37"
+            canvas.itemconfig(heads[0], fill="#B59410")
+        elif score >= 100:
+            canvas.config(highlightcolor="#0080FF")
+            body_color = "#7EF9FF"
+            canvas.itemconfig(heads[0], fill="0080FF")
+
+        for i in range(1, len(heads)):
+            canvas.itemconfig(heads[i], fill=body_color)
+
         if heads[0] and apple in eat:
             score += 1
             score_display.config(text="Score: " + str(score))
@@ -143,13 +168,13 @@ try:
             place_apple()
             x1, y1, x2, y2 = positions[len(heads) - 1]
             if x_vector == 0 and y_vector == -25:
-                new_head = canvas.create_rectangle(x1, y1 + 25, x2, y2 + 25, fill="red")
+                new_head = canvas.create_rectangle(x1, y1 + 25, x2, y2 + 25, fill=body_color)
             elif x_vector == 0 and y_vector == 25:
-                new_head = canvas.create_rectangle(x1, y1 - 25, x2, y2 - 25, fill="red")
+                new_head = canvas.create_rectangle(x1, y1 - 25, x2, y2 - 25, fill=body_color)
             elif x_vector == 25 and y_vector == 0:
-                new_head = canvas.create_rectangle(x1 - 25, y1, x2 - 25, y2, fill="red")
+                new_head = canvas.create_rectangle(x1 - 25, y1, x2 - 25, y2, fill=body_color)
             elif x_vector == -25 and y_vector == 0:
-                new_head = canvas.create_rectangle(x1 + 25, y1, x2 + 25, y2, fill="red")
+                new_head = canvas.create_rectangle(x1 + 25, y1, x2 + 25, y2, fill=body_color)
             heads.append(new_head)
 
         canvas.move(heads[0], x_vector, y_vector)
