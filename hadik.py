@@ -92,7 +92,7 @@ try:
         heads = []
         x_vector = 0
         y_vector = 25
-        score = 58
+        score = 0
         game_on = True
         is_paused = False
         canvas.delete("all")
