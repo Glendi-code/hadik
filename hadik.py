@@ -16,6 +16,11 @@ try:
 
     game_on = False
     paused = None
+    game_speed = 500
+
+    def change_speed(value):
+        global game_speed
+        game_speed = value
 
     def toggle_pause(event):
         global is_paused, game_on, paused
@@ -190,7 +195,7 @@ try:
         for i in range(1, len(heads)):
             canvas.coords(heads[i], positions[i - 1])
 
-        canvas.after(500, move)
+        canvas.after(game_speed, move)
 
     root = tk.Tk()
     root.geometry("500x550")
@@ -213,7 +218,10 @@ try:
     login_button.place(x=250, y=275, anchor="center")
 
     change_player = tk.Button(root, text="Change Player", command=change_player)
-    change_player.place(x=400, y=525, anchor="center")
+    change_player.place(x=440, y=525, anchor="center")
+
+    slider = tk.Scale(root, from_=200, to=500, orient="horizontal", command=change_speed)
+    slider.place(x=330, y=525, anchor="center")
 
     root.focus_set()
 
