@@ -43,6 +43,7 @@ try:
         if login.get() != "":
             nick = login.get()
             login.destroy()
+            change_player.config(state="normal")
             login_button.destroy()
             play_button.config(state="normal")
 
@@ -57,8 +58,8 @@ try:
 
     def place_apple():
         global x_apple, y_apple, apple
-        x_apple = rd.randint(1, 480)
-        y_apple = rd.randint(1, 480)
+        x_apple = rd.randint(1, 460)
+        y_apple = rd.randint(1, 460)
         apple = canvas.create_oval(x_apple, y_apple, x_apple + 20, y_apple + 20, fill="green")
 
     def game_over():
@@ -107,7 +108,7 @@ try:
         body_color = "#AA4A44"
         change_player.config(state="disabled")
         score_display = tk.Label(root, text="Score : " + str(score))
-        score_display.place(x=170, y=525, anchor="center")
+        score_display.place(x=170, y=540, anchor="center")
         heads.append(head)
         place_apple()
         move()
@@ -198,16 +199,16 @@ try:
         canvas.after(game_speed, move)
 
     root = tk.Tk()
-    root.geometry("500x550")
+    root.geometry("500x570")
 
     canvas = tk.Canvas(root, width=490, height=490, background="white", highlightthickness=5, highlightbackground="black", highlightcolor="black")
     canvas.place(x=250, y=250, anchor="center")
 
     play_button = tk.Button(root, text="Play", command=create_snake)
-    play_button.place(x=250, y=525, anchor="center")
+    play_button.place(x=250, y=540, anchor="center")
     play_button.config(state="disabled")
     highscore_display = tk.Label(root, text="High Score : " + str(highscore))
-    highscore_display.place(x=80, y=525, anchor="center")
+    highscore_display.place(x=80, y=540, anchor="center")
 
 
     login = tk.Entry(canvas, width=40, fg="grey")
@@ -217,11 +218,14 @@ try:
     login_button = tk.Button(root, text="Login", command=log_nick)
     login_button.place(x=250, y=275, anchor="center")
 
-    change_player = tk.Button(root, text="Change Player", command=change_player)
-    change_player.place(x=440, y=525, anchor="center")
+    change_player = tk.Button(root, text="Change Player", command=change_player, state="disabled")
+    change_player.place(x=440, y=540, anchor="center")
 
-    slider = tk.Scale(root, from_=200, to=500, orient="horizontal", command=change_speed)
+    slider = tk.Scale(root, from_=500, to=200, orient="horizontal", command=change_speed)
     slider.place(x=330, y=525, anchor="center")
+
+    slider_desc = tk.Label(root, text="Moves once every: 0.x sec", font=("Arial", 7))
+    slider_desc.place(x=330, y=550, anchor="center")
 
     root.focus_set()
 
