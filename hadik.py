@@ -18,19 +18,28 @@ try:
     paused = None
     game_speed = 500
 
+
+    def resize_canvas(event):
+        global window_height, window_width
+        window_height = root.winfo_height()
+        window_width = root.winfo_width()
+
+        canvas.place(x=0, y=0, width=window_width, height=window_height - 70)
+        bottom_frame.place(x=0, y=window_height - 70, width=window_width, height=70)
+
     def change_speed(value):
         global game_speed
         game_speed = value
 
     def toggle_pause(event):
-        global is_paused, game_on, paused
+        global is_paused, game_on, paused, window_height, window_width
         if game_on:
             is_paused = not is_paused
         if is_paused:
-            paused = canvas.create_text(250, 250, text="PAUSED", font=("Arial", 20), tags="paused_text")
-            canvas.config(bg="grey", highlightcolor="grey")
+            paused = canvas.create_text(window_width/2, (window_height-70)/2, text="PAUSED", font=("Arial", 20), tags="paused_text")
+            canvas.config(bg="grey")
         else:
-            canvas.config(bg="white", highlightcolor="red")
+            canvas.config(bg="white")
             if paused:
                 canvas.delete("paused_text")
 
@@ -58,12 +67,12 @@ try:
 
     def place_apple():
         global x_apple, y_apple, apple
-        x_apple = rd.randint(1, 460)
-        y_apple = rd.randint(1, 460)
+        x_apple = rd.randint(1, window_width - 40)
+        y_apple = rd.randint(1, window_height - 110)
         apple = canvas.create_oval(x_apple, y_apple, x_apple + 20, y_apple + 20, fill="green")
 
     def game_over():
-        global score, highscore, score_log, game_on, heads, head
+        global score, highscore, score_log, game_on, heads, head, window_width, window_height
         change_player.config(state="normal")
         game_end = tk.Label(canvas, text="GAME OVER")
         score_display = tk.Label(canvas, text="Score : " + str(score))
@@ -87,8 +96,8 @@ try:
                     f.write(line + "\n")
 
             highscore_display.config(text="Highscore: " + str(highscore))
-        game_end.place(x=250, y=250)
-        score_display.place(x=250, y=270)
+        game_end.place(relx=0.5, rely=0.5, anchor="center")
+        score_display.place(relx=0.5, rely=0.55, anchor="center")
         score_display.after(3000, score_display.destroy)
         game_end.after(3000, game_end.destroy)
         return
@@ -107,8 +116,8 @@ try:
         head = canvas.create_rectangle(240, 240, 260, 260, fill="#880808")
         body_color = "#AA4A44"
         change_player.config(state="disabled")
-        score_display = tk.Label(root, text="Score : " + str(score))
-        score_display.place(x=170, y=540, anchor="center")
+        score_display = tk.Label(bottom_frame, text="Score : " + str(score))
+        score_display.place(relx=0.35, rely=0.5, anchor="center")
         heads.append(head)
         place_apple()
         move()
@@ -143,7 +152,7 @@ try:
             canvas.after(100, move)
             return
 
-        if x1 < 0 or y1 < 0 or x2 > 500 or y2 > 500:
+        if x1 < 0 or y1 < 0 or x2 > window_width or y2 > window_height-70:
             game_over()
             return
 
@@ -201,31 +210,33 @@ try:
     root = tk.Tk()
     root.geometry("500x570")
 
-    canvas = tk.Canvas(root, width=490, height=490, background="white", highlightthickness=5, highlightbackground="black", highlightcolor="black")
-    canvas.place(x=250, y=250, anchor="center")
+    canvas = tk.Canvas(root, background="white", highlightthickness=5, highlightbackground="black", highlightcolor="black")
+    bottom_frame = tk.Frame(root, bg="gray")
+    bottom_frame.place(x=0, y=500, width=500, height=70)
 
-    play_button = tk.Button(root, text="Play", command=create_snake)
-    play_button.place(x=250, y=540, anchor="center")
+    play_button = tk.Button(bottom_frame, text="Play", command=create_snake)
+    play_button.place(relx=0.5, rely=0.5, anchor="center")
     play_button.config(state="disabled")
-    highscore_display = tk.Label(root, text="High Score : " + str(highscore))
-    highscore_display.place(x=80, y=540, anchor="center")
+    highscore_display = tk.Label(bottom_frame, text="High Score : " + str(highscore))
+    highscore_display.place(relx=0.15, rely=0.5, anchor="center")
 
 
     login = tk.Entry(canvas, width=40, fg="grey")
     login.insert(0, "Who is playing?")
     login.bind("<FocusIn>", focus_in)
-    login.place(x=250, y=250, anchor="center")
+    login.place(relx=0.5, rely=0.5, anchor="center")
     login_button = tk.Button(root, text="Login", command=log_nick)
-    login_button.place(x=250, y=275, anchor="center")
+    login_button.place(relx=0.5, rely=0.5, anchor="center")
 
-    change_player = tk.Button(root, text="Change Player", command=change_player, state="disabled")
-    change_player.place(x=440, y=540, anchor="center")
+    change_player = tk.Button(bottom_frame, text="Change Player", command=change_player, state="disabled")
+    change_player.place(relx=0.9, rely=0.5, anchor="center")
 
-    slider = tk.Scale(root, from_=500, to=200, orient="horizontal", command=change_speed)
-    slider.place(x=330, y=525, anchor="center")
+    slider = tk.Scale(bottom_frame, from_=500, to=200, orient="horizontal", command=change_speed)
+    slider.set(500)
+    slider.place(relx=0.675, rely=0.4, anchor="center")
 
-    slider_desc = tk.Label(root, text="Moves once every: 0.x sec", font=("Arial", 7))
-    slider_desc.place(x=330, y=550, anchor="center")
+    slider_desc = tk.Label(bottom_frame, text="Moves once every: 0.x sec", font=("Arial", 7))
+    slider_desc.place(relx=0.675, rely=0.8, anchor="center")
 
     root.focus_set()
 
@@ -234,6 +245,7 @@ try:
     canvas.bind("a", go_left)
     canvas.bind("d", go_right)
     canvas.bind("<space>", toggle_pause)
+    root.bind("<Configure>", resize_canvas)
 
     root.mainloop()
 
